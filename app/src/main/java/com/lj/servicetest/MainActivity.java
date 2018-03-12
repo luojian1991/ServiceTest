@@ -3,9 +3,9 @@ package com.lj.servicetest;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,12 +18,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button btnBindService;
     private Button btnUnBindService;
     private MyService.MyBinder myBinder;
-
+    private MyAIDLService myAIDLService;
     private ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            myBinder = (MyService.MyBinder) service;
-            myBinder.startDownload();
+            myAIDLService = MyAIDLService.Stub.asInterface(service);
+            try {
+                int sum = myAIDLService.plus(3, 5);
+                String upperStr = myAIDLService.toUpperCase("hellworld");
+                Log.d(TAG, "sum is " + sum);
+                Log.d(TAG, "upperStr is " + upperStr);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+//            myBinder = (MyService.MyBinder) service;
+//            myBinder.startDownload();
         }
 
         @Override
@@ -36,8 +45,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.d(TAG, "process id is" + android.os.Process.myPid());
 
-        Log.d(TAG,"MainActivity thread id is " +Thread.currentThread().getId());
+        Log.d(TAG, "MainActivity thread id is " + Thread.currentThread().getId());
         btnStartService = findViewById(R.id.btn_start_service);
         btnStopService = findViewById(R.id.btn_stop_service);
         btnBindService = findViewById(R.id.btn_bind_service
@@ -58,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startService(startService);
                 break;
             case R.id.btn_stop_service:
-                Log.d(TAG,"click Stop Service button");
+                Log.d(TAG, "click Stop Service button");
                 Intent stopService = new Intent(this, MyService.class);
                 stopService(stopService);
                 break;
@@ -67,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 bindService(bindService, connection, BIND_AUTO_CREATE);
                 break;
             case R.id.btn_unbind_service:
-                Log.d(TAG,"click Unbind Service button");
+                Log.d(TAG, "click Unbind Service button");
                 unbindService(connection);
                 break;
         }

@@ -18,7 +18,11 @@
         </activity>
 
         <service android:name="com.lj.servicetest.MyService"
-            android:process=":remote"/>
+            android:process=":remote">
+            <intent-filter>
+                <action android:name="com.lj.servicetest.MyAIDLService"></action>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
